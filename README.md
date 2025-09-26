@@ -2,112 +2,215 @@
 
 A beautiful, modern note-taking application inspired by Vercel's design aesthetic. Built with React, Vite, and Tailwind CSS.
 
-## Features
+## 🎯 **Live Deployment**
+
+**📍 Production URL**: http://167.172.236.171:3002
+
+**⚙️ Status**: ✅ **LIVE & RUNNING**
+
+## 💡 Features
 
 - ✨ **Vercel-inspired modern UI** with clean design
 - 📝 **Rich text notes** with automatic saving
 - 🔍 **Instant search** across all notes
 - 💾 **Local storage persistence** - your notes stay safe
+- 🔧 **Dark/Light mode** with system preference detection
+- 🎒 **Tag-based categorization** for organized notes
 - ⌨️ **Keyboard shortcuts** (Ctrl+S to save, Esc to cancel)
-- 📱 **Responsive design** that works on all devices
+- 📱 **Mobile-responsive design** that works on all devices
 - 🎨 **Beautiful animations** and hover effects
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 - **React 18** - Modern React with hooks
 - **Vite** - Fast build tool and dev server
 - **Tailwind CSS** - Utility-first CSS framework
 - **Lucide React** - Beautiful icons
 - **Vitest** - Testing framework
+- **Express.js** - Production server
+- **PM2** - Process management
 
-## Getting Started
+## 📝 Quick Start
 
 ### Prerequisites
+- Node.js (version 18 or higher)
+- npm
 
-- Node.js (version 16 or higher)
-- npm or yarn
+### Local Development
 
-### Installation
-
-1. Clone the repository or navigate to the project directory:
+1. **Clone the repository**
    ```bash
+   git clone https://github.com/0reilly/modern-notes-app.git
    cd modern-notes-app
    ```
 
-2. Install dependencies:
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. Start the development server:
-## VPS Deployment (Current Setup)
+3. **Start development server**
+   ```bash
+   npm run dev
+   ```
+   📍 Access at: http://localhost:5173
 
-The application is currently deployed on a VPS with IP: **167.172.236.171**
+4. **Run tests**
+   ```bash
+   npm test
+   ```
 
-### Access the Application:
+5. **Build for production**
+   ```bash
+   npm run build
+   ```
 
-- **Production URL**: http://167.172.236.171:3002
-- **Port**: 3002 (configured to bind to all network interfaces)
+## 🚀 Production Deployment
 
-### Starting the Application on VPS:
+### Current VPS Setup
+- **Server**: Ubuntu VPS
+- **Port**: 3002
+- **Process Manager**: PM2
+- **Access**: Public IP (167.172.236.171)
+
+### Deployment Commands
 
 ```bash
-cd modern-notes-app
-./start.sh
-```
-
-Or manually:
-
-```bash
-cd modern-notes-app
-npm install
+# Build the application
 npm run build
+
+# Start production server
 npm run serve
+
+# Or use the provided start script
+./start.sh
+
+# For PM2 process management
+pm2 start ecosystem.config.js --env production
 ```
 
-The server will start and bind to `0.0.0.0:3002`, making it accessible from any device on the network.
+### Manual Deployment Steps
 
-### Firewall Configuration (if needed):
+1. **Build the application**
+   ```bash
+   npm run build
+   ```
 
-If the application is not accessible, ensure port 3002 is open in your firewall:
+2. **Start the server** (binds to 0.0.0.0:3002)
+   ```bash
+   npm run serve
+   ```
+
+3. **Verify deployment**
+   ```bash
+   curl http://localhost:3002
+   ```
+
+## 📁 CI/CD Pipeline
+
+This project uses **GitHub Actions** for automated testing and deployment:
+
+### Workflow Features:
+- ✅ **Automated testing** on Node.js 18 & 20
+- ✅ **Build verification** and security audits
+- ✅ **Deployment package creation**
+- ✅ **Health checks** post-deployment
+
+### Pipeline Status:
+- **Tests**: 3/3 passing ✅
+- **Build**: Successful ✅
+- **Security**: No high/critical vulnerabilities ✅
+
+### View Pipeline:
+- GitHub Actions: https://github.com/0reilly/modern-notes-app/actions
+
+## 📖 Project Structure
+
+```
+modern-notes-app/
+├── src/
+│   ├── components/
+│   │   ├── DarkModeToggle.jsx
+│   │   ├── NoteCard.jsx
+│   │   ├── NoteEditor.jsx
+│   │   ├── RichTextEditor.jsx
+│   │   └── TagInput.jsx
+│   ├── App.jsx
+│   ├── App.test.jsx
+│   ├── index.css
+│   ├── main.jsx
+│   └── test-setup.js
+├── .github/workflows/
+│   └── deploy.yml
+├── dist/ (production build)
+├── public/
+├── ecosystem.config.js
+├── package.json
+├── server.js
+├── start.sh
+├── tailwind.config.js
+└── vite.config.js
+```
+
+## 📋 Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run serve` - Start production server
+- `npm run preview` - Preview production build
+- `npm test` - Run test suite
+- `npm run test:ui` - Run tests with UI
+
+## 🔧 Development
+
+### Key Components
+
+- **App.jsx** - Main application component
+- **NoteEditor.jsx** - Note creation/editing interface
+- **RichTextEditor.jsx** - Text formatting toolbar
+- **DarkModeToggle.jsx** - Theme switching
+- **TagInput.jsx** - Tag management
+
+### Testing
+
+Tests are written with **Vitest** and **React Testing Library**:
 
 ```bash
-# For UFW (Ubuntu)
-sudo ufw allow 3002
+# Run tests once
+npm test
 
-# For iptables
-sudo iptables -A INPUT -p tcp --dport 3002 -j ACCEPT
+# Run tests with UI
+npm run test:ui
 ```
 
-- `Ctrl+S` / `Cmd+S` - Save current note
-- `Esc` - Cancel editing
-- `Enter` in title field - Move to content field
+## 🛡 Security
 
-## Project Structure
+- ✅ **Content Security Policy** implemented
+- ✅ **XSS protection** for rich text content
+- ✅ **npm audit** integrated in CI/CD
+- ✅ **No secrets** in repository
 
-```
-src/
-├── components/
-│   ├── NoteCard.jsx      # Individual note display component
-│   └── NoteEditor.jsx    # Note creation/editing modal
-├── App.jsx               # Main application component
-├── main.jsx              # React entry point
-├── index.css             # Global styles with Tailwind
-└── test-setup.js         # Test configuration
-```
+## 📈 Performance
 
-## Customization
+- ✅ **Production-optimized** asset bundling
+- ✅ **Code splitting** for faster loads
+- ✅ **Efficient re-rendering** with React best practices
+- ✅ **Optimized images** and fonts delivery
 
-The app uses a Vercel-inspired color palette defined in `tailwind.config.js`. You can customize the colors, fonts, and other design tokens by modifying this file.
-
-## Contributing
+## 📝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests for new functionality
+4. Run tests: `npm test`
 5. Submit a pull request
 
-## License
+## 📑 License
 
 This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+**📍 Live Demo**: http://167.172.236.171:3002  
+**💻 Repository**: https://github.com/0reilly/modern-notes-app  
+**📅 Last Updated**: September 26, 2025
