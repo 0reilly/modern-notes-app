@@ -1,0 +1,94 @@
+name: Deploy Modern Notes App
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run tests
+      run: npm test -- --watchAll=false
+    
+    - name: Build application
+      run: npm run build
+    
+    - name: Run security audit
+      run: npm audit --audit-level=high
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build application
+      run: npm run build
+    
+    - name: Create deployment package
+      run: |
+        mkdir -p deployment
+        cp -r dist deployment/
+        cp package.json package-lock.json server.js start.sh ecosystem.config.js deployment/
+        tar -czf deployment.tar.gz deployment/
+    
+    - name: Upload deployment artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: deployment-package
+        path: deployment.tar.gz
+        retention-days: 1
+
+  notify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Download deployment artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: deployment-package
+    
+    - name: Notify deployment ready
+      run: |
+        echo "🚀 Deployment package created successfully!"
+        echo "📦 Artifact: deployment.tar.gz"
+        echo "🔗 Application URL: http://167.172.236.171:3002"
+        echo ""
+        echo "To deploy manually:"
+        echo "1. Download deployment.tar.gz from artifacts"
+        echo "2. Upload to VPS and extract"
+        echo "3. Run: cd deployment && npm ci --only=production"
+        echo "4. Run: pm2 start ecosystem.config.js --env production"
