@@ -14,6 +14,16 @@ Object.defineProperty(window, 'location', {
   writable: true
 });
 
+// Mock useNavigate
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
 const renderWithRouter = (ui, { route = '/share/123' } = {}) => {
   return render(
     <MemoryRouter initialEntries={[route]}>
@@ -71,16 +81,6 @@ describe('PublicNoteView Component', () => {
     });
   });
 
-  test('should show error when no data parameter is present', async () => {
-    mockLocation.search = '?other=param';
-    
-    renderWithRouter(<PublicNoteView />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('Failed to load note. The link may be invalid or expired.')).toBeInTheDocument();
-    });
-  });
-
   test('should handle back button click', async () => {
     const mockNoteData = {
       title: 'Test Note',
@@ -92,13 +92,6 @@ describe('PublicNoteView Component', () => {
     const encodedData = btoa(JSON.stringify(mockNoteData));
     mockLocation.search = `?data=${encodeURIComponent(encodedData)}`;
     
-    // Mock window.history.back
-    const backMock = vi.fn();
-    Object.defineProperty(window, 'history', {
-      value: { back: backMock },
-      writable: true
-    });
-    
     renderWithRouter(<PublicNoteView />);
     
     await waitFor(() => {
@@ -108,26 +101,33 @@ describe('PublicNoteView Component', () => {
     const backButton = screen.getByText('Back');
     backButton.click();
     
-    expect(backMock).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith('/');
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
   });
 
-  test('should handle URL parameters correctly', async () => {
-    const mockNoteData = {
-      title: 'URL Test Note',
-      content: '<p>Testing URL parameters</p>',
-      tags: ['url', 'test'],
-      createdAt: '2023-02-01T00:00:00.000Z'
-    };
+  test('should handle error state back button click', async () => {
+    mockLocation.search = '?data=invalid-base64-data';
     
-    const encodedData = btoa(JSON.stringify(mockNoteData));
-    mockLocation.search = `?data=${encodeURIComponent(encodedData)}`;
-    
-    renderWithRouter(<PublicNoteView />, { route: '/share/456' });
+    renderWithRouter(<PublicNoteView />);
     
     await waitFor(() => {
-      expect(screen.getByText('URL Test Note')).toBeInTheDocument();
-      expect(screen.getByText('Testing URL parameters')).toBeInTheDocument();
-      expect(screen.getByText('url, test')).toBeInTheDocument();
+      expect(screen.getByText('Failed to load note. The link may be invalid or expired.')).toBeInTheDocument();
+    });
+    
+    const backButton = screen.getByText('Go Back');
+    backButton.click();
+    
+    expect(mockNavigate).toHaveBeenCalledWith('/');
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+  });
+
+  test('should handle missing data parameter', async () => {
+    mockLocation.search = '';
+    
+    renderWithRouter(<PublicNoteView />);
+    
+    await waitFor(() => {
+      expect(screen.getByText('Failed to load note. The link may be invalid or expired.')).toBeInTheDocument();
     });
   });
 });
