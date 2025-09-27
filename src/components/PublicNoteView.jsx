@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar, Tag, ArrowLeft } from 'lucide-react';
 
 const PublicNoteView = () => {
@@ -7,6 +7,7 @@ const PublicNoteView = () => {
   const [note, setNote] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadNote = async () => {
@@ -67,7 +68,7 @@ const PublicNoteView = () => {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Error</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
           <button
-            onClick={() => window.history.back()}
+            onClick={() => navigate('/')}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors mx-auto"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -84,7 +85,7 @@ const PublicNoteView = () => {
         {/* Header */}
         <div className="mb-8">
           <button
-            onClick={() => window.history.back()}
+            onClick={() => navigate('/')}
             className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -95,7 +96,8 @@ const PublicNoteView = () => {
             {note.title}
           </h1>
           
-          <div className="flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
+          {/* Metadata */}
+          <div className="flex flex-wrap gap-6 text-sm text-gray-500 dark:text-gray-400">
             <div className="flex items-center">
               <Calendar className="w-4 h-4 mr-2" />
               Created {formatDate(note.createdAt)}
