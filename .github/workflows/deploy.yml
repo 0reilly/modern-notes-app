@@ -27,7 +27,7 @@ jobs:
       run: npm ci
     
     - name: Run tests
-      run: npm test -- --watchAll=false
+      run: npx vitest run
     
     - name: Build application
       run: npm run build
