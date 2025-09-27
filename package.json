@@ -1,6 +1,6 @@
 {
   "name": "modern-notes-app",
-  "version": "1.0.0",
+  "homepage": "https://0reilly.github.io/modern-notes-app",
   "description": "A modern note-taking app with Vercel-inspired UI",
   "type": "module",
   "scripts": {
