@@ -59,14 +59,13 @@ jobs:
       run: npm ci
     
     - name: Build application
-        cp -r dist deployment/
-        cp package.json package-lock.json server.js start.sh ecosystem.config.cjs deployment/
+      run: npm run build
     
     - name: Create deployment package
       run: |
         mkdir -p deployment
         cp -r dist deployment/
-        cp package.json package-lock.json server.js start.sh ecosystem.config.js deployment/
+        cp package.json package-lock.json server.js start.sh ecosystem.config.cjs deployment/
         tar -czf deployment.tar.gz deployment/
     
     - name: Upload deployment artifact
