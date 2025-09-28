@@ -55,7 +55,7 @@ const Sidebar = ({
   return (
     <aside className={`
       bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 
-      fixed top-0 left-0 h-full z-20 transition-all duration-300
+      fixed md:relative top-0 left-0 h-full z-20 transition-all duration-300
       ${collapsed ? 'w-16' : 'w-64'}
     `}>
       {/* Collapse Toggle */}
@@ -88,31 +88,29 @@ const Sidebar = ({
               key={item.id}
               onClick={() => onViewChange(item.id)}
               className={`
-                w-full flex items-center px-3 py-2 rounded-lg transition-all duration-200
+                w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
                 ${isActive 
                   ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' 
-                  : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700'
                 }
-                ${collapsed ? 'justify-center' : 'justify-between'}
               `}
             >
-              <div className="flex items-center space-x-3">
-                <Icon className={`w-5 h-5 ${item.color}`} />
-                {!collapsed && (
-                  <span className="font-medium">{item.label}</span>
-                )}
-              </div>
-              
-              {!collapsed && item.count > 0 && (
-                <span className={`
-                  px-2 py-1 text-xs rounded-full font-medium
-                  ${isActive 
-                    ? 'bg-blue-100 text-blue-600 dark:bg-blue-800 dark:text-blue-300'
-                    : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
-                  }
-                `}>
-                  {item.count}
-                </span>
+              <Icon className={`w-5 h-5 ${item.color}`} />
+              {!collapsed && (
+                <>
+                  <span className="ml-3 flex-1 text-left">{item.label}</span>
+                  {item.count > 0 && (
+                    <span className={`
+                      inline-flex items-center justify-center px-2 py-1 text-xs font-medium rounded-full
+                      ${isActive 
+                        ? 'bg-blue-100 text-blue-600 dark:bg-blue-800 dark:text-blue-300'
+                        : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                      }
+                    `}>
+                      {item.count}
+                    </span>
+                  )}
+                </>
               )}
             </button>
           );
