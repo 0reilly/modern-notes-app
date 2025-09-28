@@ -59,7 +59,8 @@ jobs:
       run: npm ci
     
     - name: Build application
-      run: npm run build
+        cp -r dist deployment/
+        cp package.json package-lock.json server.js start.sh ecosystem.config.cjs deployment/
     
     - name: Create deployment package
       run: |
