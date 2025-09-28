@@ -187,7 +187,7 @@ function App() {
         <Routes>
           <Route path="/public/:noteId" element={<PublicNoteView />} />
           <Route path="/" element={
-            <div className="flex">
+            <div className="flex h-screen">
               {/* Sidebar */}
               <Sidebar
                 activeView={activeView}

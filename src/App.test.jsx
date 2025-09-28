@@ -231,5 +231,57 @@ describe('Modern Notes App', () => {
     
     // Verify that URL.createObjectURL is available for export functionality
     expect(typeof window.URL.createObjectURL).toBe('function');
+  describe('Responsive Sidebar Layout', () => {
+    test('sidebar has correct positioning classes', () => {
+      localStorageMock.getItem.mockReturnValue(null);
+      render(<App />);
+      
+      const sidebar = screen.getByRole('complementary');
+      expect(sidebar).toHaveClass('fixed', 'md:relative', 'h-screen');
+    });
+
+    test('main content has responsive margin classes', () => {
+      localStorageMock.getItem.mockReturnValue(null);
+      render(<App />);
+      
+      const mainContent = screen.getByRole('main');
+      expect(mainContent.parentElement).toHaveClass('md:ml-64');
+    });
+
+    test('sidebar collapses and expands correctly', () => {
+      localStorageMock.getItem.mockReturnValue(null);
+      render(<App />);
+      
+      const collapseButton = screen.getByRole('button', { name: /collapse/i });
+      const sidebar = screen.getByRole('complementary');
+      
+      // Initially expanded
+      expect(sidebar).toHaveClass('w-64');
+      
+      // Collapse sidebar
+      fireEvent.click(collapseButton);
+      expect(sidebar).toHaveClass('w-16');
+      
+      // Expand sidebar
+      fireEvent.click(collapseButton);
+      expect(sidebar).toHaveClass('w-64');
+    });
+
+    test('main content margin adjusts when sidebar collapses', () => {
+      localStorageMock.getItem.mockReturnValue(null);
+      render(<App />);
+      
+      const collapseButton = screen.getByRole('button', { name: /collapse/i });
+      const mainContentContainer = screen.getByRole('main').parentElement;
+      
+      // Initially expanded
+      expect(mainContentContainer).toHaveClass('md:ml-64');
+      
+      // Collapse sidebar
+      fireEvent.click(collapseButton);
+      expect(mainContentContainer).toHaveClass('md:ml-16');
+    });
   });
+
+});
 });

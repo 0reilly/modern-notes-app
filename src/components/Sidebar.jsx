@@ -55,7 +55,7 @@ const Sidebar = ({
   return (
     <aside className={`
       bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 
-      fixed md:relative top-0 left-0 h-full z-20 transition-all duration-300
+      fixed md:relative top-0 left-0 h-screen z-20 transition-all duration-300
       ${collapsed ? 'w-16' : 'w-64'}
     `}>
       {/* Collapse Toggle */}
