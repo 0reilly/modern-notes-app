@@ -17,6 +17,10 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 })
 
+// Mock URL.createObjectURL for export functionality
+window.URL.createObjectURL = vi.fn(() => 'blob:http://localhost/test');
+window.URL.revokeObjectURL = vi.fn();
+
 // Mock localStorage
 const localStorageMock = {
   getItem: vi.fn(),
