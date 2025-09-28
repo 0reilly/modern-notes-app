@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
 import { Share2, Check } from 'lucide-react';
 
-const ShareButton = ({ onShare }) => {
+const ShareButton = ({ note }) => {
   const [isCopied, setIsCopied] = useState(false);
+
+  const generateShareUrl = () => {
+    // In a real app, this would generate a proper shareable URL
+    // For now, we'll create a simple public URL simulation
+    const baseUrl = window.location.origin;
+    return `${baseUrl}/public/${note.id}`;
+  };
 
   const handleShare = async () => {
     try {
-      const shareUrl = onShare();
+      const shareUrl = generateShareUrl();
       
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(shareUrl);
@@ -32,19 +39,17 @@ const ShareButton = ({ onShare }) => {
   return (
     <button
       onClick={handleShare}
-      className="share-btn flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800"
-      title="Share note"
+      className={`p-1 md:p-2 rounded-lg transition-colors duration-200 ${
+        isCopied 
+          ? 'text-green-500' 
+          : 'text-gray-400 hover:text-blue-500'
+      } hover:bg-gray-50 dark:hover:bg-gray-700`}
+      title={isCopied ? 'URL copied!' : 'Share note'}
     >
       {isCopied ? (
-        <>
-          <Check className="w-4 h-4" />
-          Copied!
-        </>
+        <Check className="w-3 h-3 md:w-4 md:h-4" />
       ) : (
-        <>
-          <Share2 className="w-4 h-4" />
-          Share
-        </>
+        <Share2 className="w-3 h-3 md:w-4 md:h-4" />
       )}
     </button>
   );

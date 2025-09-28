@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, test, expect, beforeEach } from 'vitest';
 import ShareButton from '../ShareButton';
 
@@ -10,116 +10,149 @@ Object.assign(navigator, {
   }
 });
 
+// Mock window.location
+const mockLocation = {
+  origin: 'http://localhost:3000'
+};
+Object.defineProperty(window, 'location', { value: mockLocation });
+
 describe('ShareButton Component', () => {
   beforeEach(() => {
     navigator.clipboard.writeText.mockClear();
   });
 
   test('should render share button with correct icon', () => {
-    const mockOnShare = vi.fn().mockReturnValue('http://example.com/share/123');
-    render(<ShareButton onShare={mockOnShare} />);
+    const mockNote = {
+      id: '123',
+      title: 'Test Note',
+      content: 'Test content'
+    };
     
-    expect(screen.getByText('Share')).toBeInTheDocument();
-    expect(screen.getByTitle('Share note')).toBeInTheDocument();
+    render(<ShareButton note={mockNote} />);
+    
+    const shareButton = screen.getByTitle('Share note');
+    expect(shareButton).toBeInTheDocument();
   });
 
   test('should generate shareable URL when clicked', async () => {
-    const mockOnShare = vi.fn().mockReturnValue('http://example.com/share/123');
-    render(<ShareButton onShare={mockOnShare} />);
+    const mockNote = {
+      id: '123',
+      title: 'Test Note',
+      content: 'Test content'
+    };
     
-    const shareButton = screen.getByText('Share');
-    
-    await act(async () => {
-      fireEvent.click(shareButton);
-    });
-    
-    expect(mockOnShare).toHaveBeenCalledTimes(1);
-  });
-
-  test('should copy URL to clipboard', async () => {
-    const mockOnShare = vi.fn().mockReturnValue('http://example.com/share/123');
     navigator.clipboard.writeText.mockResolvedValue();
     
-    render(<ShareButton onShare={mockOnShare} />);
+    render(<ShareButton note={mockNote} />);
     
-    const shareButton = screen.getByText('Share');
+    const shareButton = screen.getByTitle('Share note');
     
-    await act(async () => {
-      fireEvent.click(shareButton);
-    });
+    fireEvent.click(shareButton);
     
     await waitFor(() => {
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('http://example.com/share/123');
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('http://localhost:3000/public/123');
     });
   });
 
   test('should show success message after copying', async () => {
-    const mockOnShare = vi.fn().mockReturnValue('http://example.com/share/123');
+    const mockNote = {
+      id: '123',
+      title: 'Test Note',
+      content: 'Test content'
+    };
+    
     navigator.clipboard.writeText.mockResolvedValue();
     
-    render(<ShareButton onShare={mockOnShare} />);
+    render(<ShareButton note={mockNote} />);
     
-    const shareButton = screen.getByText('Share');
+    const shareButton = screen.getByTitle('Share note');
     
-    await act(async () => {
-      fireEvent.click(shareButton);
-    });
+    fireEvent.click(shareButton);
     
     await waitFor(() => {
-      expect(screen.getByText('Copied!')).toBeInTheDocument();
+      expect(screen.getByTitle('URL copied!')).toBeInTheDocument();
     });
   });
 
   test('should handle clipboard errors gracefully', async () => {
-    const mockOnShare = vi.fn().mockReturnValue('http://example.com/share/123');
+    const mockNote = {
+      id: '123',
+      title: 'Test Note',
+      content: 'Test content'
+    };
+    
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     navigator.clipboard.writeText.mockRejectedValue(new Error('Clipboard error'));
     
-    // Mock console.error to avoid test noise
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(<ShareButton note={mockNote} />);
     
-    render(<ShareButton onShare={mockOnShare} />);
+    const shareButton = screen.getByTitle('Share note');
     
-    const shareButton = screen.getByText('Share');
+    fireEvent.click(shareButton);
     
-    await act(async () => {
-      fireEvent.click(shareButton);
-    });
-    
-    // Should not show success message on error
     await waitFor(() => {
-      expect(screen.queryByText('Copied!')).not.toBeInTheDocument();
+      expect(consoleError).toHaveBeenCalledWith('Failed to copy URL:', expect.any(Error));
     });
     
-    consoleSpy.mockRestore();
+    consoleError.mockRestore();
   });
 
-  test('should use fallback clipboard method when modern API is unavailable', async () => {
-    const mockOnShare = vi.fn().mockReturnValue('http://example.com/share/123');
+  test('should use fallback clipboard method when navigator.clipboard is not available', async () => {
+    const mockNote = {
+      id: '123',
+      title: 'Test Note',
+      content: 'Test content'
+    };
     
-    // Remove modern clipboard API
+    // Mock older browser without navigator.clipboard
+    const originalClipboard = navigator.clipboard;
     delete navigator.clipboard;
     
     // Mock document.execCommand
-    const execCommandMock = vi.fn().mockReturnValue(true);
-    Object.defineProperty(document, 'execCommand', { value: execCommandMock });
+    document.execCommand = vi.fn().mockReturnValue(true);
     
-    render(<ShareButton onShare={mockOnShare} />);
+    render(<ShareButton note={mockNote} />);
     
-    const shareButton = screen.getByText('Share');
+    const shareButton = screen.getByTitle('Share note');
     
-    await act(async () => {
-      fireEvent.click(shareButton);
-    });
+    fireEvent.click(shareButton);
     
     await waitFor(() => {
-      expect(execCommandMock).toHaveBeenCalledWith('copy');
+      expect(document.execCommand).toHaveBeenCalledWith('copy');
     });
     
-    // Restore clipboard API
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: vi.fn()
-      }
+    // Restore clipboard
+    Object.assign(navigator, { clipboard: originalClipboard });
+  });
+
+  test('should revert to share icon after 2 seconds', async () => {
+    const mockNote = {
+      id: '123',
+      title: 'Test Note',
+      content: 'Test content'
+    };
+    
+    navigator.clipboard.writeText.mockResolvedValue();
+    
+    vi.useFakeTimers();
+    
+    render(<ShareButton note={mockNote} />);
+    
+    const shareButton = screen.getByTitle('Share note');
+    
+    fireEvent.click(shareButton);
+    
+    await waitFor(() => {
+      expect(screen.getByTitle('URL copied!')).toBeInTheDocument();
     });
+    
+    // Fast-forward time
+    vi.advanceTimersByTime(2000);
+    
+    await waitFor(() => {
+      expect(screen.getByTitle('Share note')).toBeInTheDocument();
+    });
+    
+    vi.useRealTimers();
   });
 });
