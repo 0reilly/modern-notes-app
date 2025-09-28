@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="A modern note-taking app with Vercel-inspired UI, featuring rich text editing, dark mode, and offline support" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/modern-notes-app/manifest.json" />
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Modern Notes - Vercel Inspired" />
+    <meta property="og:description" content="A modern note-taking app with Vercel-inspired UI" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://0reilly.github.io/modern-notes-app" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Modern Notes" />
+    <meta name="twitter:description" content="A modern note-taking app with Vercel-inspired UI" />
+    
+    <title>Modern Notes - Vercel Inspired</title>
+    
+    <!-- Service Worker Registration (for PWA) -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js').then(function(registration) {
+            console.log('SW registered: ', registration);
+          }).catch(function(registrationError) {
+            console.log('SW registration failed: ', registrationError);
+          });
+        });
+      }
+    </script>
+    
+    <!-- Dark Mode Detection -->
+    <script>
+      // Check for saved theme preference or respect OS setting
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+    </script>
+    <script type="module" crossorigin src="/modern-notes-app/assets/index-17146a73.js"></script>
+    <link rel="stylesheet" href="/modern-notes-app/assets/index-77ac1def.css">
+  </head>
+  <body class="antialiased">
+    <div id="root"></div>
+    
+    
+    <!-- Loading fallback -->
+    <noscript>
+      <div style="text-align: center; padding: 2rem; font-family: Inter, sans-serif;">
+        <h1>Modern Notes</h1>
+        <p>JavaScript is required to run this application. Please enable JavaScript to continue.</p>
+      </div>
+    </noscript>
+  </body>
+</html>
